@@ -43,6 +43,7 @@
 
 #include <llvm/ADT/Statistic.h>
 #include <llvm/IR/InstIterator.h>
+#include <llvm/IR/Instructions.h>
 #include <llvm/Pass.h>
 #include <llvm/Transforms/Utils/Local.h>
 #include <llvm/Transforms/Utils/UnifyFunctionExitNodes.h>
@@ -64,7 +65,11 @@ struct MarkNoReturnFunctionPass final : public ModulePass {
   MarkNoReturnFunctionPass() : ModulePass(ID) {}
 
   void getAnalysisUsage(AnalysisUsage& AU) const override {
+#if defined(LLVM_VERSION_MAJOR) && (LLVM_VERSION_MAJOR >= 12)
+    AU.addRequired< UnifyFunctionExitNodesLegacyPass >();
+#else
     AU.addRequired< UnifyFunctionExitNodes >();
+#endif
   }
 
   bool runOnModule(Module& m) override {
@@ -80,10 +85,16 @@ struct MarkNoReturnFunctionPass final : public ModulePass {
       return false;
     }
 
+#if defined(LLVM_VERSION_MAJOR) && (LLVM_VERSION_MAJOR >= 12)
+    for (BasicBlock &I : f)
+      if (isa<ReturnInst>(I.getTerminator()))
+        return false; // Found a return.
+#else
     UnifyFunctionExitNodes* ufen = &getAnalysis< UnifyFunctionExitNodes >(f);
     if (ufen->getReturnBlock() != nullptr) {
       return false;
     }
+#endif
 
     bool may_have_side_effects = false;
     for (auto it = inst_begin(f), et = inst_end(f); it != et; ++it) {

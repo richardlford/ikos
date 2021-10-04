@@ -168,12 +168,20 @@ int main(int argc, char** argv) {
   llvm::initializeInstrumentation(registry);
   llvm::initializeTarget(registry);
   llvm::initializeExpandMemCmpPassPass(registry);
+#if defined(LLVM_VERSION_MAJOR) && (LLVM_VERSION_MAJOR >= 12)
+  llvm::initializeScalarizeMaskedMemIntrinLegacyPassPass(registry);
+#else
   llvm::initializeScalarizeMaskedMemIntrinPass(registry);
+#endif
   llvm::initializeCodeGenPreparePass(registry);
   llvm::initializeAtomicExpandPass(registry);
   llvm::initializeRewriteSymbolsLegacyPassPass(registry);
   llvm::initializeWinEHPreparePass(registry);
+#if defined(LLVM_VERSION_MAJOR) && (LLVM_VERSION_MAJOR >= 12)
+  //llvm::initializeDwarfEHPreparePass(registry);
+#else
   llvm::initializeDwarfEHPreparePass(registry);
+#endif
   llvm::initializeSafeStackLegacyPassPass(registry);
   llvm::initializeSjLjEHPreparePass(registry);
   llvm::initializeStackProtectorPass(registry);
@@ -378,7 +386,11 @@ int main(int argc, char** argv) {
     pass_manager.add(ikos_pp::create_remove_unreachable_blocks_pass());
 
     // Dead instruction elimination (opt -die)
+#if defined(LLVM_VERSION_MAJOR) && (LLVM_VERSION_MAJOR >= 12)
+    pass_manager.add(llvm::createDeadCodeEliminationPass());
+#else
     pass_manager.add(llvm::createDeadInstEliminationPass());
+#endif
 
     // Canonical form for loops (opt -loop-simplify)
     pass_manager.add(llvm::createLoopSimplifyPass());

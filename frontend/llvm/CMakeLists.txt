@@ -103,8 +103,8 @@ include_directories(${AR_INCLUDE_DIR})
 find_package(LLVM REQUIRED)
 include_directories(SYSTEM ${LLVM_INCLUDE_DIR})
 
-if ((LLVM_VERSION VERSION_LESS "9") OR (NOT (LLVM_VERSION VERSION_LESS "12")))
-  message(FATAL_ERROR "LLVM 9/10/11 is required.")
+if ((LLVM_VERSION VERSION_LESS "9") OR (NOT (LLVM_VERSION VERSION_LESS "13")))
+  message(FATAL_ERROR "LLVM 9/10/11/12 is required.")
 endif()
 
 if ((LLVM_VERSION VERSION_EQUAL "9"))
@@ -119,6 +119,11 @@ endif()
 
 if ((LLVM_VERSION VERSION_EQUAL "11"))
   set(LLVM_VERSION_MAJOR "11")
+  add_definitions (-DLLVM_VERSION_MAJOR=${LLVM_VERSION_MAJOR})
+endif()
+
+if ((LLVM_VERSION VERSION_EQUAL "12"))
+  set(LLVM_VERSION_MAJOR "12")
   add_definitions (-DLLVM_VERSION_MAJOR=${LLVM_VERSION_MAJOR})
 endif()
 
