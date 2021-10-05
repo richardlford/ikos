@@ -178,10 +178,7 @@ ar::Function* BundleImporter::translate_function(llvm::Function* fun) {
     ar_fun = this->translate_clang_generated_function(fun);
   } else {
     // No debug information on internal function
-    std::ostringstream buf;
-    buf << "missing debug information for llvm function "
-        << fun->getName().str();
-    throw ImportError(buf.str());
+    ar_fun = this->translate_internal_function(fun);
   }
 
   if (ar_fun != nullptr) {
@@ -254,6 +251,27 @@ ar::Function* BundleImporter::translate_extern_function(llvm::Function* fun) {
                                   fun->getName().str(),
                                   /*is_definition = */ false);
   }
+
+  ikos_assert(ar_fun);
+  return ar_fun;
+}
+
+ar::Function* BundleImporter::translate_internal_function(llvm::Function* fun) {
+  ikos_assert(!fun->isDeclaration());
+
+  ar::Function* ar_fun = nullptr;
+
+  // Otherwise, just prefer signed integers,
+  // because int is more common than unsigned in C
+  llvm::FunctionType* type = fun->getFunctionType();
+
+  auto ar_type = ar::cast< ar::FunctionType >(
+      _ctx.type_imp->translate_type(type, ar::Signed));
+
+  ar_fun = ar::Function::create(this->_bundle,
+				ar_type,
+				fun->getName().str(),
+				/*is_definition = */ true);
 
   ikos_assert(ar_fun);
   return ar_fun;

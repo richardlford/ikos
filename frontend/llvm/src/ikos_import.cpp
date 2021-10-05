@@ -184,8 +184,8 @@ int main(int argc, char** argv) {
     // Check for debug information
     if (!llvm_to_ar::has_debug_info(*module)) {
       llvm::errs() << progname << ": " << InputFilename
-                   << ": error: input module has no debug information\n";
-      return 3;
+                   << ": warning: input module has no debug information\n";
+      llvm::errs() << "... Output may be less user friendly.\n";
     }
 
     // AR context
