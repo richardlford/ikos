@@ -43,6 +43,7 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/core/support/assert.hpp>
 
 #include <ikos/ar/semantic/statement.hpp>
@@ -353,8 +354,14 @@ ar::Function* BundleImporter::translate_library_function(llvm::Function* fun) {
       buf << "llvm function " << fun->getName().str() << " and ar intrinsic "
           << ar_fun->name() << " have a different type";
     }
-
-    throw ImportError(buf.str());
+    std::cerr << "Warning:" << buf.str() << "\n";
+    std::cerr << "LLVM function declaration\n";
+    fun -> dump();
+    std::cerr << "ikos ar expected function declaration\n";
+    ar_fun->dmp();
+    std::cerr << "Expected signature will be ignored.\n";
+    ar_fun = nullptr;
+    // throw ImportError(buf.str());
   }
 
   return ar_fun;

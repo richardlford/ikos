@@ -55,26 +55,26 @@ namespace ar {
 class Namer {
 private:
   // Map from variable to name
-  std::unordered_map< Variable*, std::string > _variables;
+  std::unordered_map< const Variable*, std::string > _variables;
 
   // Map from basic block to name
-  std::unordered_map< BasicBlock*, std::string > _basic_blocks;
+  std::unordered_map< const BasicBlock*, std::string > _basic_blocks;
 
 public:
   /// \brief Public constructor
   Namer();
 
   /// \brief Public constructor
-  explicit Namer(Code*);
+  explicit Namer(const Code*);
 
   /// \brief Initialize the namer with the given code
-  void init(Code*);
+  void init(const Code*);
 
   /// \brief Return the deterministic name of the given variable
-  const std::string& name(Variable*) const;
+  const std::string& name(const Variable*) const;
 
   /// \brief Return the deterministic name of the given basic block
-  const std::string& name(BasicBlock*) const;
+  const std::string& name(const BasicBlock*) const;
 
 }; // end class Namer
 

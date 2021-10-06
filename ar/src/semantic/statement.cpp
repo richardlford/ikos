@@ -41,8 +41,10 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/bundle.hpp>
 #include <ikos/ar/semantic/statement.hpp>
+#include <ikos/ar/format/text.hpp>
 
 namespace ikos {
 namespace ar {
@@ -94,6 +96,13 @@ bool Statement::has_undefined_constant_operand() const {
 
 void Statement::set_parent(BasicBlock* parent) {
   this->_parent = parent;
+}
+
+void Statement::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  // Or this->dump(std::cerr);?
+  std::cerr << "\n";
 }
 
 // Assignment

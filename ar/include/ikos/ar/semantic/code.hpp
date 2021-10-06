@@ -294,6 +294,8 @@ public:
   /// \brief Dump the basic block and its content, for debugging purpose
   void full_dump(std::ostream&) const;
 
+  /// \brief Dump basic block to stderr
+  void dmp() const;
 }; // end class BasicBlock
 
 /// \brief Code
@@ -457,6 +459,9 @@ public:
   /// Using the basic block after calling erase_basic_block() is an undefined
   /// behaviour
   void erase_basic_block(BasicBlock*);
+
+  /// \brief Dump code to stderr
+  void dmp() const;
 
 private:
   /// \brief Add an internal variable in the code

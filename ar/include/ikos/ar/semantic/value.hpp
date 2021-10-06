@@ -197,6 +197,9 @@ public:
     return this->_kind == InternalVariableKind;
   }
 
+  /// \brief Dump value to stderr
+  void dmp() const;
+
 protected:
   /// \brief Get the context implementation
   ///

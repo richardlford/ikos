@@ -41,11 +41,13 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/code.hpp>
 #include <ikos/ar/semantic/context.hpp>
 #include <ikos/ar/semantic/function.hpp>
 #include <ikos/ar/semantic/value.hpp>
 #include <ikos/ar/support/assert.hpp>
+#include <ikos/ar/format/text.hpp>
 
 #include "context_impl.hpp"
 
@@ -59,6 +61,11 @@ Value::Value(ValueKind kind, Type* type) : _kind(kind), _type(type) {
 }
 
 Value::~Value() = default;
+
+void Value::dmp() const {
+  this->dump(std::cerr);
+  std::cerr << "\n";
+}
 
 ContextImpl& Value::ctx_impl(Context& ctx) {
   return *(ctx._impl);

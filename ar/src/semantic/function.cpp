@@ -41,12 +41,14 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/bundle.hpp>
 #include <ikos/ar/semantic/code.hpp>
 #include <ikos/ar/semantic/context.hpp>
 #include <ikos/ar/semantic/function.hpp>
 #include <ikos/ar/semantic/value.hpp>
 #include <ikos/ar/support/assert.hpp>
+#include <ikos/ar/format/text.hpp>
 
 namespace ikos {
 namespace ar {
@@ -113,6 +115,12 @@ void Function::set_name(std::string new_name) {
   }
 
   this->_parent->rename_function(this, prev_name, this->_name);
+}
+
+void Function::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  std::cerr << "\n";
 }
 
 LocalVariable* Function::add_local_variable(

@@ -80,38 +80,38 @@ public:
   ~TextFormatter() = default;
 
   /// \brief Format a bundle into text format
-  void format(std::ostream&, Bundle*) const;
+  void format(std::ostream&, const Bundle*) const;
 
   /// \brief Format a global variable into text format
-  void format(std::ostream&, GlobalVariable*) const;
+  void format(std::ostream&, const GlobalVariable*) const;
 
   /// \brief Format a function into text format
-  void format(std::ostream&, Function*) const;
+  void format(std::ostream&, const Function*) const;
 
   /// \brief Format a code into text format
-  void format(std::ostream&, Code*) const;
+  void format(std::ostream&, const Code*) const;
 
   /// \brief Format a code into text format
-  void format(std::ostream&, Code*, const Namer&) const;
+  void format(std::ostream&, const Code*, const Namer&) const;
 
   /// \brief Format a basic block into text format
-  void format(std::ostream&, BasicBlock*) const;
+  void format(std::ostream&, const BasicBlock*) const;
 
   /// \brief Format a basic block into text format
-  void format(std::ostream&, BasicBlock*, const Namer&) const;
+  void format(std::ostream&, const BasicBlock*, const Namer&) const;
 
   /// \brief Format a statement into text format
-  void format(std::ostream&, Statement*) const;
+  void format(std::ostream&, const Statement*) const;
 
   /// \brief Format a statement into text format
-  void format(std::ostream&, Statement*, const Namer&) const;
+  void format(std::ostream&, const Statement*, const Namer&) const;
 
   /// \brief Format a type into text format
-  void format(std::ostream&, Type*) const;
+  void format(std::ostream&, const Type*) const;
 
   /// \brief Format a value into text format
   void format(std::ostream&,
-              Value*,
+              const Value*,
               const Namer&,
               bool show_type = false) const;
 

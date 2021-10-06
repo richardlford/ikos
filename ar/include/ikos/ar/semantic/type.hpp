@@ -180,6 +180,9 @@ public:
   /// Returns zero for non-primitive type.
   unsigned primitive_bit_width() const;
 
+  /// \brief Dump type to stderr
+  void dmp() const;
+
 protected:
   /// \brief Get the context implementation
   ///
