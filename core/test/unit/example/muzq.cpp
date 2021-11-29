@@ -75,6 +75,23 @@ using ZIntervalDomain = numeric::IntervalDomain< ZNumber, Variable >;
 using QIntervalDomain = numeric::IntervalDomain< QNumber, Variable >;
 using ZDBM = numeric::DBM< ZNumber, Variable >;
 
+using FixPtIt = muzq::FixpointIterator< Variable, ZIntervalDomain, QIntervalDomain >;
+
+namespace db {
+void dbb(const BasicBlock& it) {
+  it.dump(std::cout);
+}
+
+void dcfg(const ControlFlowGraph& it) {
+  it.dump(std::cout);
+}
+
+void dfpi(const void* itv) {
+  const FixPtIt& it= *(FixPtIt*)itv;
+  it.dump(std::cout);
+}
+}
+
 BOOST_AUTO_TEST_CASE(test1) {
   ControlFlowGraph cfg("entry");
 
@@ -109,13 +126,13 @@ BOOST_AUTO_TEST_CASE(test1) {
 
   ret->add(std::make_unique< CheckPoint >("loop.end"));
 
-  // cfg.dump(std::cout);
+  cfg.dump(std::cout);
 
   muzq::FixpointIterator< Variable, ZIntervalDomain, QIntervalDomain > fixpoint(
       cfg);
   fixpoint.run({ZIntervalDomain::top(), QIntervalDomain::top()});
 
-  // fixpoint.dump(std::cout);
+  fixpoint.dump(std::cout);
 
   ZIntervalDomain loop_in = fixpoint.checkpoint("loop.in").first();
   BOOST_CHECK(loop_in.to_interval(i) == ZInterval(ZBound(0), ZBound(9)));

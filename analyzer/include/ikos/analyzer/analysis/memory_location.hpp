@@ -120,6 +120,7 @@ public:
   /// \brief Dump the memory location, for debugging purpose
   virtual void dump(std::ostream&) const = 0;
 
+  void dmp() const;
 }; // end class MemoryLocation
 
 /// \brief Local memory location

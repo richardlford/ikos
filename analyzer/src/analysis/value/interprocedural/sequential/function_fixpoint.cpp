@@ -45,7 +45,18 @@
 #include <ikos/analyzer/analysis/execution_engine/numerical.hpp>
 #include <ikos/analyzer/analysis/pointer/pointer.hpp>
 #include <ikos/analyzer/analysis/value/interprocedural/sequential/function_fixpoint.hpp>
+#include <ikos/ar/format/text.hpp>
 
+namespace db {
+void dabs(const void* p) {
+  const auto pabs = (const ikos::analyzer::value::AbstractDomain *)p;
+  pabs->dump(std::cout);
+}
+
+void dnl() {
+  std::cout << std::endl;
+}
+}
 namespace ikos {
 namespace analyzer {
 namespace value {
@@ -69,6 +80,7 @@ FunctionFixpoint::FunctionFixpoint(
     ProgressLogger& logger,
     ar::Function* entry_point)
     : FwdFixpointIterator(entry_point->body(), make_bottom_abstract_value(ctx)),
+      FunctionFixpointBase{ctx, entry_point},
       _ctx(ctx),
       _function(entry_point),
       _call_context(ctx.call_context_factory->get_empty()),
@@ -76,13 +88,24 @@ FunctionFixpoint::FunctionFixpoint(
       _checkers(checkers),
       _exit_invariant(make_bottom_abstract_value(ctx)),
       _return_stmt(nullptr),
-      _logger(logger) {}
+      _logger(logger)
+{
+  if (_ctx.opts.trace_ar_statements) {
+    ar::TextFormatter formatter{};
+    auto& stream = analyzer::log::msg().stream();
+    stream << "\n>>>>>>>>>>>>>>\nEntering Interprocedural Sequential FunctionFixpoint for ";
+    ar::Namer namer;
+    formatter.format_header(stream, _function, namer);
+    stream << std::endl;
+  }
+}
 
 FunctionFixpoint::FunctionFixpoint(Context& ctx,
                                    const FunctionFixpoint& caller,
                                    ar::CallBase* call,
                                    ar::Function* callee)
     : FwdFixpointIterator(callee->body(), make_bottom_abstract_value(ctx)),
+      FunctionFixpointBase{ctx, callee},
       _ctx(ctx),
       _function(callee),
       _call_context(
@@ -91,7 +114,32 @@ FunctionFixpoint::FunctionFixpoint(Context& ctx,
       _checkers(caller._checkers),
       _exit_invariant(make_bottom_abstract_value(ctx)),
       _return_stmt(nullptr),
-      _logger(caller._logger) {}
+      _logger(caller._logger)
+{
+  if (_ctx.opts.trace_ar_statements) {
+    ar::TextFormatter formatter{};
+    auto& stream = analyzer::log::msg().stream();
+    stream << "\n>>>>>>>>>>>>>>\nEntering Interprocedural Sequential FunctionFixpoint for ";
+    ar::Namer namer;
+    formatter.format_header(stream, _function, namer);
+    stream << "\n  from caller ";
+    formatter.format_header(stream, caller._function, namer);
+    stream << "\n  from call site ";
+    call->dump(stream);
+    stream << std::endl;
+  }
+}
+
+FunctionFixpoint::~FunctionFixpoint() noexcept {
+  if (_ctx.opts.trace_ar_statements) {
+    ar::TextFormatter formatter{};
+    auto& stream = analyzer::log::msg().stream();
+    stream << "\n<<<<<<<<<<\nExiting Interprocedural Sequential FunctionFixpoint for ";
+    ar::Namer namer;
+    formatter.format_header(stream, _function, namer);
+    stream << std::endl;
+  }
+}
 
 void FunctionFixpoint::run(AbstractDomain inv) {
   if (!this->_call_context->empty()) {
@@ -203,8 +251,30 @@ AbstractDomain FunctionFixpoint::analyze_node(ar::BasicBlock* bb,
                                               *this,
                                               this->_callees_cache);
   exec_engine.exec_enter(bb);
+  if (_ctx.opts.trace_ar_statements) {
+    auto& stream = analyzer::log::msg().stream();
+    stream << "Entering basic block: ";
+    bb->dump(stream);
+    stream << std::endl;
+    stream << "  Invariant on entry to basic block:" << std::endl;
+    exec_engine.inv().dump(stream);
+    stream << std::endl;
+  }
+
   for (ar::Statement* stmt : *bb) {
+    if (_ctx.opts.trace_ar_statements) {
+      auto& stream = analyzer::log::msg().stream();
+      stream << "Processing: ";
+      stmt->dump(stream);
+      stream << std::endl;
+    }
     transfer_function(exec_engine, call_exec_engine, stmt);
+    if (_ctx.opts.trace_ar_statements) {
+      auto& stream = analyzer::log::msg().stream();
+      stream << "  Invariant after: ";
+      exec_engine.inv().dump(stream);
+      stream << std::endl;
+    }
   }
   exec_engine.exec_leave(bb);
   return std::move(exec_engine.inv());
@@ -269,6 +339,8 @@ void FunctionFixpoint::run_checks() {
     this->_logger.start_callee(this->_call_context, this->_function);
   }
 
+  bool report_checks = !this->is_filtered_out(this->function());
+
   for (ar::BasicBlock* bb : *this->cfg()) {
     NumericalExecutionEngineT
         exec_engine(this->pre(bb),
@@ -293,8 +365,10 @@ void FunctionFixpoint::run_checks() {
       // Check the statement if it's related to an llvm instruction
       if (stmt->has_frontend()) {
         exec_engine.inv().normalize();
-        for (const auto& checker : this->_checkers) {
-          checker->check(stmt, exec_engine.inv(), this->_call_context);
+        if (report_checks) {
+          for (const auto& checker : this->_checkers) {
+            checker->check(stmt, exec_engine.inv(), this->_call_context);
+          }
         }
       }
 

@@ -609,6 +609,10 @@ public:
     }
   }
 
+  __attribute_noinline__
+  void dmp() const {
+    dump(std::cout);
+  }
 }; // end class ControlFlowGraph
 
 /// \brief Apply a statement visitor on a statement
@@ -857,6 +861,11 @@ public:
       it->second.dump(o);
       o << "\n";
     }
+  }
+
+  __attribute_noinline__
+  void dmp() const {
+    dump(std::cout);
   }
 
 }; // end class FixpointIterator

@@ -10,6 +10,7 @@
 
 #include <ikos/core/fixpoint/fwd_fixpoint_iterator.hpp>
 
+#include <ikos/analyzer/util/demangle.hpp>
 #include <ikos/analyzer/analysis/call_context.hpp>
 #include <ikos/analyzer/analysis/context.hpp>
 #include <ikos/analyzer/analysis/execution_engine/fixpoint_cache.hpp>
@@ -28,27 +29,23 @@ private:
   /// \brief Analyzed function
   ar::Function* _function;
 
-  /// \brief Current call context
-  CallContext* _call_context;
-
-  /// \brief Fixpoint parameters
-  const CodeFixpointParameters& _fixpoint_parameters;
-
 public:
   /// \brief Constructor for an entry point
   ///
   /// \param ctx Analysis context
   /// \param checkers List of checkers to run
   /// \param entry_point Function to analyze
-  FunctionFixpointBase(Context& ctx,
-                   ar::Function* entry_point) noexcept
-      : _ctx(ctx), _function(entry_point),
-        _call_context(ctx.call_context_factory->get_empty()),
-        _fixpoint_parameters(ctx.fixpoint_parameters->get(entry_point))
+  FunctionFixpointBase(Context& ctx, ar::Function* entry_point) noexcept
+      : _ctx(ctx), _function(entry_point)
   {
 
   }
 
+  /// \brief Return true if checks for this function should be filtered out.
+  ///
+  /// \param fun The function to check
+  /// \return True if the functions checks should be omitted.
+  bool is_filtered_out(ar::Function* fun) const;
 };
 
 } // end namespace analyzer

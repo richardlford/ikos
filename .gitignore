@@ -38,3 +38,4 @@ __pycache__
 *.db
 .idea
 cmake-build-debug
+TAGS

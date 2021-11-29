@@ -83,6 +83,11 @@ def parse_arguments(argv):
                         metavar='<file>',
                         help='Output database file (default: output.db)',
                         default='output.db')
+    parser.add_argument('--function-filter',
+                        dest='function_filter',
+                        metavar='<extended regex>',
+                        help='Functions to ignore in reports',
+                        default='')
     parser.add_argument('-v',
                         dest='verbosity',
                         help='Increase verbosity',
@@ -343,6 +348,11 @@ def parse_arguments(argv):
     debug.add_argument('--display-ar',
                        dest='display_ar',
                        help='Display the Abstract Representation as text',
+                       action='store_true',
+                       default=False)
+    debug.add_argument('--trace-ar-stmts',
+                       dest='trace_ar_stmts',
+                       help='Trace analysis of ar statements',
                        action='store_true',
                        default=False)
     debug.add_argument('--display-liveness',
@@ -772,8 +782,11 @@ def ikos_analyzer(db_path, pp_path, opt):
             '-j=%d' % opt.jobs,
             '-widening-strategy=%s' % opt.widening_strategy,
             '-widening-delay=%d' % opt.widening_delay,
-            '-widening-period=%d' % opt.widening_period]
+            '-widening-period=%d' % opt.widening_period
+            ]
 
+    if opt.function_filter:
+        cmd.append('-function-filter=%s' % opt.function_filter)
     if opt.narrowing_strategy == 'auto':
         if opt.domain in domains_without_narrowing:
             cmd.append('-narrowing-strategy=meet')
@@ -843,6 +856,8 @@ def ikos_analyzer(db_path, pp_path, opt):
 
     if opt.display_ar:
         cmd.append('-display-ar')
+    if opt.trace_ar_stmts:
+        cmd.append('-trace-ar-stmts')
     if opt.display_liveness:
         cmd.append('-display-liveness')
     if opt.display_function_pointer:

@@ -144,11 +144,10 @@ void TextFormatter::format(std::ostream& o, const GlobalVariable* gv) const {
   }
 }
 
-void TextFormatter::format(std::ostream& o, const Function* f) const {
-  FunctionType* type = f->type();
-  Namer namer;
+void TextFormatter::format_header(std::ostream& o, const Function* f,
+                                  Namer& namer) const {
 
-  // declare/define
+  FunctionType* type = f->type(); // declare/define
   if (f->is_declaration()) {
     o << "declare ";
   } else {
@@ -157,14 +156,14 @@ void TextFormatter::format(std::ostream& o, const Function* f) const {
   }
 
   // return type and name
-  this->format(o, type->return_type());
+  format(o, type->return_type());
   o << " @" << f->name();
 
   // parameters
   o << "(";
   if (f->is_declaration()) {
     for (auto it = type->param_begin(), et = type->param_end(); it != et;) {
-      this->format(o, *it);
+      format(o, *it);
       ++it;
       if (it != et) {
         o << ", ";
@@ -172,7 +171,7 @@ void TextFormatter::format(std::ostream& o, const Function* f) const {
     }
   } else {
     for (auto it = f->param_begin(), et = f->param_end(); it != et;) {
-      this->format(o, *it, namer, true);
+      format(o, *it, namer, true);
       ++it;
       if (it != et) {
         o << ", ";
@@ -186,6 +185,11 @@ void TextFormatter::format(std::ostream& o, const Function* f) const {
     o << "...";
   }
   o << ")";
+}
+
+void TextFormatter::format(std::ostream& o, const Function* f) const {
+  Namer namer;
+  format_header(o, f, namer);
 
   // body
   if (f->is_declaration()) {
@@ -196,7 +200,6 @@ void TextFormatter::format(std::ostream& o, const Function* f) const {
     o << "}\n";
   }
 }
-
 void TextFormatter::format(std::ostream& o, const Code* code) const {
   this->format(o, code, Namer(code));
 }

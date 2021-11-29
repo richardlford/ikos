@@ -196,6 +196,5 @@ public:
   void dump(std::ostream& o) const;
 
 }; // end class FixpointParameters
-
 } // end namespace analyzer
 } // end namespace ikos

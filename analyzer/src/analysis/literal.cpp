@@ -48,6 +48,7 @@
 #include <ikos/ar/semantic/value_visitor.hpp>
 
 #include <ikos/analyzer/analysis/literal.hpp>
+#include <iostream>
 
 namespace ikos {
 namespace analyzer {
@@ -327,6 +328,10 @@ public:
 Literal LiteralFactory::create_literal(ar::Value* value) {
   ValueVisitor vis(this->_vfac, this->_data_layout);
   return ar::apply_visitor(vis, value);
+}
+
+void Literal::dmp() const {
+  this->dump(std::cout);
 }
 
 } // end namespace analyzer
