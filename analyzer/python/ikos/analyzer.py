@@ -83,11 +83,15 @@ def parse_arguments(argv):
                         metavar='<file>',
                         help='Output database file (default: output.db)',
                         default='output.db')
+    parser.add_argument('--no-filter-functions',
+                        help='Disable function filtering (default=%(default)s)',
+                        action='store_true',
+                        default=False)
     parser.add_argument('--function-filter',
                         dest='function_filter',
                         metavar='<extended regex>',
-                        help='Functions to ignore in reports',
-                        default='')
+                        help='Regex matching functions to ignore in reports (default=%(default)s)',
+                        default='(std|__gnu_cxx)::')
     parser.add_argument('-v',
                         dest='verbosity',
                         help='Increase verbosity',
@@ -785,7 +789,7 @@ def ikos_analyzer(db_path, pp_path, opt):
             '-widening-period=%d' % opt.widening_period
             ]
 
-    if opt.function_filter:
+    if (not opt.no_filter_functions) and opt.function_filter:
         cmd.append('-function-filter=%s' % opt.function_filter)
     if opt.narrowing_strategy == 'auto':
         if opt.domain in domains_without_narrowing:

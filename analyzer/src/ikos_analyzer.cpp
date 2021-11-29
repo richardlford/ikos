@@ -120,7 +120,7 @@ static llvm::cl::opt< std::string > FunctionFilter(
     "function-filter",
     llvm::cl::desc("Regex matching function names to ignore in reports"),
     llvm::cl::value_desc("extended regex"),
-    llvm::cl::init("std::"),
+    llvm::cl::init(""),
     llvm::cl::cat(MainCategory));
 
 static llvm::cl::opt< analyzer::LogLevel > LogLevel(
