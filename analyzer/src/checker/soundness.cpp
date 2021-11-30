@@ -207,6 +207,11 @@ std::vector< SoundnessChecker::CheckResult > SoundnessChecker::check_call(
         checks.push_back(check);
       }
     } else if (callee->is_declaration()) {
+      std::string name = callee->name();
+      // TODO: Generalize this.
+      if (name == "__asm_endbr64"){
+        continue;
+      }
       checks.push_back(this->check_unknown_extern_call(call, callee, inv));
     } else if (callee->is_definition()) {
       // This is sound
