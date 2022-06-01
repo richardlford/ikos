@@ -36,3 +36,6 @@ __pycache__
 # IKOS
 *.ar
 *.db
+.idea
+cmake-build-debug
+TAGS

@@ -52,6 +52,7 @@
 #include <ikos/analyzer/analysis/context.hpp>
 #include <ikos/analyzer/analysis/execution_engine/fixpoint_cache.hpp>
 #include <ikos/analyzer/analysis/fixpoint_parameters.hpp>
+#include <ikos/analyzer/analysis/function_fixpoint_base.hpp>
 #include <ikos/analyzer/analysis/value/abstract_domain.hpp>
 #include <ikos/analyzer/analysis/value/interprocedural/sequential/progress.hpp>
 #include <ikos/analyzer/checker/checker.hpp>
@@ -64,7 +65,8 @@ namespace sequential {
 
 /// \brief Sequential interprocedural fixpoint on a function body
 class FunctionFixpoint final
-    : public core::InterleavedFwdFixpointIterator< ar::Code*, AbstractDomain > {
+    : public core::InterleavedFwdFixpointIterator< ar::Code*, AbstractDomain >,
+        public FunctionFixpointBase {
 private:
   /// \brief Parent class
   using FwdFixpointIterator =
@@ -122,6 +124,8 @@ public:
                    const FunctionFixpoint& caller,
                    ar::CallBase* call,
                    ar::Function* callee);
+
+  ~FunctionFixpoint();
 
   /// \brief Compute the fixpoint
   void run(AbstractDomain inv) override;

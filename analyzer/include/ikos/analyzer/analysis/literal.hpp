@@ -289,6 +289,7 @@ public:
     boost::apply_visitor(Dumper(o), this->_lit);
   }
 
+  void dmp() const;
 }; // end class Literal
 
 /// \brief Write a literal on a stream

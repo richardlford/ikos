@@ -47,6 +47,7 @@
 
 #include <ikos/analyzer/analysis/memory_location.hpp>
 #include <ikos/analyzer/util/source_location.hpp>
+#include <iostream>
 
 namespace ikos {
 namespace analyzer {
@@ -56,6 +57,10 @@ namespace analyzer {
 MemoryLocation::MemoryLocation(MemoryLocationKind kind) : _kind(kind) {}
 
 MemoryLocation::~MemoryLocation() = default;
+
+void MemoryLocation::dmp() const {
+  this->dump(std::cout);
+}
 
 // LocalMemoryLocation
 

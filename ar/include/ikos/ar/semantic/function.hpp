@@ -227,6 +227,9 @@ public:
     return FunctionPointerConstant::get(this->context(), this);
   }
 
+  /// \brief Dump function to stderr
+  void dmp() const;
+
 private:
   /// \brief Add a local variable in the function
   ///

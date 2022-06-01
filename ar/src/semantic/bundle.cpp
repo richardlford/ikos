@@ -41,6 +41,7 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/bundle.hpp>
 #include <ikos/ar/semantic/code.hpp>
 #include <ikos/ar/semantic/context.hpp>
@@ -48,6 +49,7 @@
 #include <ikos/ar/semantic/function.hpp>
 #include <ikos/ar/semantic/value.hpp>
 #include <ikos/ar/support/assert.hpp>
+#include <ikos/ar/format/text.hpp>
 
 #include "context_impl.hpp"
 
@@ -60,7 +62,7 @@ Bundle::Bundle(Context& ctx,
     : _context(ctx),
       _data_layout(std::move(data_layout)),
       _target_triple(std::move(triple)) {
-  ikos_assert_msg(!this->_target_triple.empty(), "empty target triple");
+  // ikos_assert_msg(!this->_target_triple.empty(), "empty target triple");
 }
 
 Bundle::~Bundle() = default;
@@ -115,6 +117,12 @@ std::string Bundle::find_available_name(StringRef prefix) const {
 
   name += std::to_string(idx);
   return name;
+}
+
+void Bundle::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  std::cerr << "\n";
 }
 
 void Bundle::add_global_variable(std::unique_ptr< GlobalVariable > gv) {

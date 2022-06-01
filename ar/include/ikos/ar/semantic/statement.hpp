@@ -197,6 +197,9 @@ public:
   /// \brief Dump the statement for debugging purpose
   virtual void dump(std::ostream&) const = 0;
 
+  /// \brief Dump statement to stderr
+  void dmp() const;
+
   /// \brief Clone the statement
   ///
   /// Returns a fresh statement thas has no parent

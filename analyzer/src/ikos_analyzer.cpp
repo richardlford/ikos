@@ -116,6 +116,13 @@ static llvm::cl::opt< std::string > OutputFilename(
     llvm::cl::init("output.db"),
     llvm::cl::cat(MainCategory));
 
+static llvm::cl::opt< std::string > FunctionFilter(
+    "function-filter",
+    llvm::cl::desc("Regex matching function names to ignore in reports"),
+    llvm::cl::value_desc("extended regex"),
+    llvm::cl::init(""),
+    llvm::cl::cat(MainCategory));
+
 static llvm::cl::opt< analyzer::LogLevel > LogLevel(
     "log",
     llvm::cl::desc("Log level:"),
@@ -581,6 +588,11 @@ static llvm::cl::opt< bool > DisplayAR(
     llvm::cl::desc("Display the Abstract Representation as text"),
     llvm::cl::cat(DebugCategory));
 
+static llvm::cl::opt< bool > TraceARStmts(
+    "trace-ar-stmts",
+    llvm::cl::desc("Trace Abstract Representation statements during analysis"),
+    llvm::cl::cat(DebugCategory));
+
 static llvm::cl::opt< bool > GenerateDot(
     "generate-dot",
     llvm::cl::desc("Generate a .dot file for each function"),
@@ -807,12 +819,16 @@ static analyzer::AnalysisOptions make_analysis_options(ar::Bundle* bundle) {
       .use_partitioning_domain = EnablePartitioningDomain,
       .use_fixpoint_cache = !NoFixpointCache,
       .use_checks = !NoChecks,
+      .trace_ar_statements = TraceARStmts,
       .globals_init_policy = GlobalsInitPolicy,
       .progress = Progress,
       .display_invariants = DisplayInvariants,
       .display_checks = DisplayChecks,
       .hardware_addresses = {bundle, HardwareAddresses, HardwareAddressesFile},
       .argc = ((Argc >= 0) ? boost::optional< int >(Argc) : boost::none),
+      .functions_to_ignore = FunctionFilter,
+      .functions_to_ignore_regex =
+          std::regex(FunctionFilter, std::regex::extended)
   };
 }
 
@@ -859,7 +875,7 @@ static void generate_dot(ar::Bundle* bundle,
 
 /// \brief Main for ikos-analyzer
 int main(int argc, char** argv) {
-  llvm::InitLLVM x(argc, argv);
+   llvm::InitLLVM x(argc, argv);
 
   // Program name
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)

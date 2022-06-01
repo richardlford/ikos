@@ -1247,7 +1247,7 @@ private:
     CellSetT cells = this->_cells.get(base);
     cells.add(new_cell);
     this->_cells.set(base, cells);
-    return new_cell;
+   return new_cell;
   }
 
   /// \brief Assignment `var = literal`

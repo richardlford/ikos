@@ -56,7 +56,7 @@
 
 namespace ikos {
 namespace analyzer {
-namespace {
+namespace live_anon {
 
 /// \brief Lattice of liveness
 ///
@@ -461,7 +461,7 @@ void LivenessAnalysis::run() {
 
 /// \brief Convert a LivenessDomain into a VariableRefList
 static LivenessAnalysis::VariableRefList to_variable_ref_list(
-    const LivenessDomain< Variable* >& value) {
+    const live_anon::LivenessDomain< Variable* >& value) {
   LivenessAnalysis::VariableRefList list;
 
   if (!value.is_bottom()) {
@@ -479,8 +479,8 @@ void LivenessAnalysis::run(ar::Code* code) {
   }
 
   // Run the liveness fixpoint iterator
-  LivenessFixpointIterator fixpoint(code, *_ctx.var_factory);
-  fixpoint.run(LivenessDomain< Variable* >::bottom());
+  live_anon::LivenessFixpointIterator fixpoint(code, *_ctx.var_factory);
+  fixpoint.run(live_anon::LivenessDomain< Variable* >::bottom());
 
   // Store the results
   for (auto it = fixpoint.live_at_entry_begin(),

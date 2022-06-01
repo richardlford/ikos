@@ -257,6 +257,7 @@ inline void transfer_function(ExecEngine& exec_engine,
     void operator()(ar::Resume* s) { exec_engine.exec(s); }
   };
   StatementVisitor visitor{exec_engine, call_exec_engine};
+
   ar::apply_visitor(visitor, stmt);
 }
 

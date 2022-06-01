@@ -41,11 +41,13 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/bundle.hpp>
 #include <ikos/ar/semantic/code.hpp>
 #include <ikos/ar/semantic/function.hpp>
 #include <ikos/ar/semantic/statement.hpp>
 #include <ikos/ar/semantic/value.hpp>
+#include <ikos/ar/format/text.hpp>
 
 namespace ikos {
 namespace ar {
@@ -263,6 +265,12 @@ void BasicBlock::full_dump(std::ostream& o) const {
   o << "}\n";
 }
 
+void BasicBlock::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  std::cerr << "\n";
+}
+
 // Code
 
 Code::Code(Function* function)
@@ -312,6 +320,12 @@ void Code::erase_basic_block(BasicBlock* bb) {
                                        return bb_ptr.get() == bb;
                                      }),
                       this->_blocks.end());
+}
+
+void Code::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  std::cerr << "\n";
 }
 
 InternalVariable* Code::add_internal_variable(

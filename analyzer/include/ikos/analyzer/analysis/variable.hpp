@@ -163,6 +163,7 @@ public:
   /// \brief Dump the variable, for debugging purpose
   virtual void dump(std::ostream&) const = 0;
 
+  void dmp() const;
 }; // end class Variable
 
 /// \brief Local variable

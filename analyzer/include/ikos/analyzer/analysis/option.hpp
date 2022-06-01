@@ -43,6 +43,7 @@
 
 #pragma once
 
+#include <regex>
 #include <vector>
 
 #include <boost/container/flat_map.hpp>
@@ -335,6 +336,9 @@ public:
   /// \brief Wether we should perform checks or not
   bool use_checks;
 
+  /// \brief Whether to trace states during analysis
+  bool trace_ar_statements;
+
   /// \brief Policy of initialization for global variables
   GlobalsInitPolicy globals_init_policy;
 
@@ -353,6 +357,11 @@ public:
   /// \brief Value of argc, or boost::none
   boost::optional< int > argc;
 
+  /// String to initialize regular expression to match demangled
+  /// function names to ignore.
+  std::string functions_to_ignore;
+
+  std::regex functions_to_ignore_regex;
 public:
   /// \brief Save the options in the output database
   void save(SettingsTable&);

@@ -192,6 +192,7 @@ add_executable(ikos-analyzer
   src/ikos_analyzer.cpp
   src/analysis/call_context.cpp
   src/analysis/fixpoint_parameters.cpp
+  src/analysis/function_fixpoint_base.cpp
   src/analysis/hardware_addresses.cpp
   src/analysis/literal.cpp
   src/analysis/liveness.cpp
@@ -275,8 +276,7 @@ add_executable(ikos-analyzer
   src/util/log.cpp
   src/util/progress.cpp
   src/util/source_location.cpp
-  src/util/timer.cpp
-)
+  src/util/timer.cpp)
 if (IKOS_LINK_LLVM_DYLIB)
   set(IKOS_ANALYZER_LLVM_LIBS "LLVM")
 else()

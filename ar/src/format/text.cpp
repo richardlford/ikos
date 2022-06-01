@@ -52,7 +52,7 @@
 namespace ikos {
 namespace ar {
 
-void TextFormatter::format(std::ostream& o, Bundle* bundle) const {
+void TextFormatter::format(std::ostream& o, const Bundle* bundle) const {
   o << "// Bundle\n";
 
   // data layout
@@ -70,7 +70,9 @@ void TextFormatter::format(std::ostream& o, Bundle* bundle) const {
   o << "target-pointer-size = " << data_layout.pointers.bit_width << " bits\n";
 
   // target triple
-  o << "target-triple = " << bundle->target_triple() << "\n";
+  if (!bundle->target_triple().empty()) {
+    o << "target-triple = " << bundle->target_triple() << "\n";
+  }
 
   if (!this->order_globals()) {
     // global variables
@@ -115,7 +117,7 @@ void TextFormatter::format(std::ostream& o, Bundle* bundle) const {
   }
 }
 
-void TextFormatter::format(std::ostream& o, GlobalVariable* gv) const {
+void TextFormatter::format(std::ostream& o, const GlobalVariable* gv) const {
   // declare/define
   if (gv->is_declaration()) {
     o << "declare ";
@@ -142,11 +144,10 @@ void TextFormatter::format(std::ostream& o, GlobalVariable* gv) const {
   }
 }
 
-void TextFormatter::format(std::ostream& o, Function* f) const {
-  FunctionType* type = f->type();
-  Namer namer;
+void TextFormatter::format_header(std::ostream& o, const Function* f,
+                                  Namer& namer) const {
 
-  // declare/define
+  FunctionType* type = f->type(); // declare/define
   if (f->is_declaration()) {
     o << "declare ";
   } else {
@@ -155,14 +156,14 @@ void TextFormatter::format(std::ostream& o, Function* f) const {
   }
 
   // return type and name
-  this->format(o, type->return_type());
+  format(o, type->return_type());
   o << " @" << f->name();
 
   // parameters
   o << "(";
   if (f->is_declaration()) {
     for (auto it = type->param_begin(), et = type->param_end(); it != et;) {
-      this->format(o, *it);
+      format(o, *it);
       ++it;
       if (it != et) {
         o << ", ";
@@ -170,7 +171,7 @@ void TextFormatter::format(std::ostream& o, Function* f) const {
     }
   } else {
     for (auto it = f->param_begin(), et = f->param_end(); it != et;) {
-      this->format(o, *it, namer, true);
+      format(o, *it, namer, true);
       ++it;
       if (it != et) {
         o << ", ";
@@ -184,6 +185,11 @@ void TextFormatter::format(std::ostream& o, Function* f) const {
     o << "...";
   }
   o << ")";
+}
+
+void TextFormatter::format(std::ostream& o, const Function* f) const {
+  Namer namer;
+  format_header(o, f, namer);
 
   // body
   if (f->is_declaration()) {
@@ -194,25 +200,24 @@ void TextFormatter::format(std::ostream& o, Function* f) const {
     o << "}\n";
   }
 }
-
-void TextFormatter::format(std::ostream& o, Code* code) const {
+void TextFormatter::format(std::ostream& o, const Code* code) const {
   this->format(o, code, Namer(code));
 }
 
 void TextFormatter::format(std::ostream& o,
-                           Code* code,
+                           const Code* code,
                            const Namer& namer) const {
   for (auto it = code->begin(), et = code->end(); it != et; ++it) {
     this->format(o, *it, namer);
   }
 }
 
-void TextFormatter::format(std::ostream& o, BasicBlock* bb) const {
+void TextFormatter::format(std::ostream& o, const BasicBlock* bb) const {
   this->format(o, bb, Namer(bb->code()));
 }
 
 void TextFormatter::format(std::ostream& o,
-                           BasicBlock* bb,
+                           const BasicBlock* bb,
                            const Namer& namer) const {
   Code* code = bb->code();
 
@@ -264,7 +269,7 @@ void TextFormatter::format(std::ostream& o,
   o << "}\n";
 }
 
-void TextFormatter::format(std::ostream& o, Statement* stmt) const {
+void TextFormatter::format(std::ostream& o, const Statement* stmt) const {
   Namer namer(stmt->code());
   this->format(o, stmt, namer);
 }
@@ -478,10 +483,10 @@ public:
 } // end anonymous namespace
 
 void TextFormatter::format(std::ostream& o,
-                           Statement* stmt,
+                           const Statement* stmt,
                            const Namer& namer) const {
   FormatTextStatement vis(*this, o, namer);
-  apply_visitor(vis, stmt);
+  apply_visitor(vis, const_cast<Statement*>(stmt));
 }
 
 namespace {
@@ -607,9 +612,9 @@ public:
 
 } // end anonymous namespace
 
-void TextFormatter::format(std::ostream& o, Type* type) const {
+void TextFormatter::format(std::ostream& o, const Type* type) const {
   FormatTextType vis(o);
-  apply_visitor(vis, type);
+  apply_visitor(vis, const_cast<Type*>(type));
 }
 
 namespace {
@@ -627,15 +632,15 @@ public:
   FormatTextValue(std::ostream& o_, const Namer& namer_)
       : o(o_), namer(namer_) {}
 
-  void operator()(UndefinedConstant* /*c*/) { o << "undef"; }
+  void operator()(const UndefinedConstant* /*c*/) { o << "undef"; }
 
-  void operator()(IntegerConstant* c) { o << c->value(); }
+  void operator()(const IntegerConstant* c) { o << c->value(); }
 
-  void operator()(FloatConstant* c) { o << c->value(); }
+  void operator()(const FloatConstant* c) { o << c->value(); }
 
-  void operator()(NullConstant* /*c*/) { o << "null"; }
+  void operator()(const NullConstant* /*c*/) { o << "null"; }
 
-  void operator()(StructConstant* c) {
+  void operator()(const StructConstant* c) {
     o << "{";
     for (auto it = c->field_begin(), et = c->field_end(); it != et;) {
       o << it->offset << ": ";
@@ -648,7 +653,7 @@ public:
     o << "}";
   }
 
-  void operator()(ArrayConstant* c) {
+  void operator()(const ArrayConstant* c) {
     o << "[";
     for (auto it = c->element_begin(), et = c->element_end(); it != et;) {
       apply_visitor(*this, *it);
@@ -660,7 +665,7 @@ public:
     o << "]";
   }
 
-  void operator()(VectorConstant* c) {
+  void operator()(const VectorConstant* c) {
     o << "<";
     for (auto it = c->element_begin(), et = c->element_end(); it != et;) {
       apply_visitor(*this, *it);
@@ -672,28 +677,28 @@ public:
     o << ">";
   }
 
-  void operator()(AggregateZeroConstant* /*c*/) { o << "aggregate_zero"; }
+  void operator()(const AggregateZeroConstant* /*c*/) { o << "aggregate_zero"; }
 
-  void operator()(FunctionPointerConstant* c) {
+  void operator()(const FunctionPointerConstant* c) {
     o << "@" << c->function()->name();
   }
 
-  void operator()(InlineAssemblyConstant* c) {
+  void operator()(const InlineAssemblyConstant* c) {
     o << "asm \"" << c->code() << "\"";
   }
 
-  void operator()(GlobalVariable* v) { o << "@" << v->name(); }
+  void operator()(const GlobalVariable* v) { o << "@" << v->name(); }
 
-  void operator()(LocalVariable* v) { o << "$" << namer.name(v); }
+  void operator()(const LocalVariable* v) { o << "$" << namer.name(v); }
 
-  void operator()(InternalVariable* v) { o << "%" << namer.name(v); }
+  void operator()(const InternalVariable* v) { o << "%" << namer.name(v); }
 
 }; // end class FormatTextValue
 
 } // end anonymous namespace
 
 void TextFormatter::format(std::ostream& o,
-                           Value* value,
+                           const Value* value,
                            const Namer& namer,
                            bool show_type) const {
   if (show_type) {
@@ -701,7 +706,7 @@ void TextFormatter::format(std::ostream& o,
     o << " ";
   }
   FormatTextValue vis(o, namer);
-  apply_visitor(vis, value);
+  apply_visitor(vis, const_cast<Value*>(value));
 }
 
 } // end namespace ar

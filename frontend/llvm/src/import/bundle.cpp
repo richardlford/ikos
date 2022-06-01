@@ -356,10 +356,13 @@ ar::Function* BundleImporter::translate_library_function(llvm::Function* fun) {
     }
     std::cerr << "Warning: " << buf.str() << "\n";
     std::cerr << "LLVM function declaration\n";
+    // Release build of llvm does not have dump function.
+    // fun -> dump();
     std::cerr << "ikos ar expected function declaration\n";
+    // ar_fun->dmp();
     std::cerr << "Expected signature will be ignored.\n";
     ar_fun = nullptr;
-  }
+   }
 
   return ar_fun;
 }

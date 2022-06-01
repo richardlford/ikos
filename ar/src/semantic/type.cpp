@@ -41,10 +41,12 @@
  *
  ******************************************************************************/
 
+#include <iostream>
 #include <ikos/ar/semantic/context.hpp>
 #include <ikos/ar/semantic/type.hpp>
 #include <ikos/ar/support/assert.hpp>
 #include <ikos/ar/support/cast.hpp>
+#include <ikos/ar/format/text.hpp>
 
 #include "context_impl.hpp"
 
@@ -94,6 +96,12 @@ unsigned Type::primitive_bit_width() const {
     default:
       return 0;
   }
+}
+
+void Type::dmp() const {
+  TextFormatter tf{};
+  tf.format(std::cerr, this);
+  std::cerr << "\n";
 }
 
 ContextImpl& Type::ctx_impl(Context& ctx) {

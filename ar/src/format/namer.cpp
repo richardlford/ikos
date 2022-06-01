@@ -52,11 +52,11 @@ namespace ar {
 
 Namer::Namer() = default;
 
-Namer::Namer(Code* code) {
+Namer::Namer(const Code* code) {
   this->init(code);
 }
 
-void Namer::init(Code* code) {
+void Namer::init(const Code* code) {
   // Counter
   std::size_t bb_idx = 0;
   std::size_t var_idx = 0;
@@ -169,7 +169,7 @@ void Namer::init(Code* code) {
   }
 }
 
-const std::string& Namer::name(Variable* v) const {
+const std::string& Namer::name(const Variable* v) const {
   if (v->has_name()) {
     return v->name();
   } else {
@@ -178,7 +178,7 @@ const std::string& Namer::name(Variable* v) const {
   }
 }
 
-const std::string& Namer::name(BasicBlock* bb) const {
+const std::string& Namer::name(const BasicBlock* bb) const {
   if (bb->has_name()) {
     return bb->name();
   } else {

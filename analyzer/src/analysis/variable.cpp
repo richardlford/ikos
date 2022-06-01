@@ -47,6 +47,7 @@
 
 #include <ikos/analyzer/analysis/variable.hpp>
 #include <ikos/analyzer/exception.hpp>
+#include <iostream>
 
 namespace ikos {
 namespace analyzer {
@@ -59,6 +60,10 @@ Variable::Variable(VariableKind kind, ar::Type* type)
 }
 
 Variable::~Variable() = default;
+
+void Variable::dmp() const {
+  this->dump(std::cout);
+}
 
 // LocalVariable
 

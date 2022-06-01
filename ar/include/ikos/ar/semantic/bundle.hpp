@@ -173,6 +173,8 @@ public:
   /// \brief Find an available name with the given prefix
   std::string find_available_name(StringRef prefix) const;
 
+  /// \brief Dump bundle to stderr
+  void dmp() const;
 private:
   /// \brief Add a global variable in the bundle
   void add_global_variable(std::unique_ptr< GlobalVariable >);
